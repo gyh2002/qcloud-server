@@ -4,6 +4,7 @@ import com.orange.qcloud.request.LoginRequest;
 import com.orange.qcloud.request.RegisterRequest;
 import com.orange.qcloud.entity.Users;
 import com.orange.qcloud.response.AuthenticationResponse;
+import com.orange.qcloud.response.CmdAuthenticationResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -18,6 +19,8 @@ public interface UsersService {
     AuthenticationResponse register(RegisterRequest registerReq);
 
     AuthenticationResponse login(LoginRequest loginReq);
+
+    CmdAuthenticationResponse cmdLogin(LoginRequest loginReq);
 
     void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException;
 }
