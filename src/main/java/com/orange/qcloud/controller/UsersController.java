@@ -5,6 +5,7 @@ import com.orange.qcloud.request.LoginRequest;
 import com.orange.qcloud.request.RegisterRequest;
 import com.orange.qcloud.entity.Users;
 import com.orange.qcloud.response.AuthenticationResponse;
+import com.orange.qcloud.response.CmdAuthenticationResponse;
 import com.orange.qcloud.service.UsersService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,6 +39,11 @@ public class UsersController {
     @PostMapping("/login")
     public ApiResponse<AuthenticationResponse> login(@RequestBody LoginRequest loginReq) {
         return ApiResponse.success(usersService.login(loginReq));
+    }
+
+    @PostMapping("/cmd-login")
+    public ApiResponse<CmdAuthenticationResponse> cmdLogin(@RequestBody LoginRequest loginReq) {
+        return ApiResponse.success(usersService.cmdLogin(loginReq));
     }
 
     @PostMapping("/refresh-token")

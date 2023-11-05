@@ -29,7 +29,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(
                         authorizeRequests ->
                                 authorizeRequests
-                                        .requestMatchers("/user/register", "/user/login")
+                                        .requestMatchers("/user/register", "/user/login", "/user/cmd-login")
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated()

@@ -29,6 +29,9 @@ public class Token {
     @Column(nullable = false)
     private boolean expired;
 
+    @Column(nullable = true)
+    private boolean isTemp;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
