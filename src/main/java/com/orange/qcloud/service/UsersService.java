@@ -1,5 +1,6 @@
 package com.orange.qcloud.service;
 
+import com.orange.qcloud.dto.UsersDto;
 import com.orange.qcloud.request.LoginRequest;
 import com.orange.qcloud.request.RegisterRequest;
 import com.orange.qcloud.entity.Users;
@@ -14,7 +15,7 @@ import java.util.List;
 public interface UsersService {
     List<Users> findAllUsers();
 
-    Users findUserByEmail(String email);
+    UsersDto findUserByEmail(String email);
 
     AuthenticationResponse register(RegisterRequest registerReq);
 
@@ -23,4 +24,6 @@ public interface UsersService {
     CmdAuthenticationResponse cmdLogin(LoginRequest loginReq);
 
     void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException;
+
+    String sendEmailCode(String email);
 }

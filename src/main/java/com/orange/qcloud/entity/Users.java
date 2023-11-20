@@ -43,6 +43,10 @@ public class Users implements UserDetails {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
+    public String getRealUsername() {
+        return username;
+    }
+
     @Override
     public String getUsername() {
         return email;

@@ -1,6 +1,8 @@
 package com.orange.qcloud.controller;
 
 import com.orange.qcloud.common.ApiResponse;
+import com.orange.qcloud.dto.FilesDTO;
+import com.orange.qcloud.dto.UsersDto;
 import com.orange.qcloud.request.LoginRequest;
 import com.orange.qcloud.request.RegisterRequest;
 import com.orange.qcloud.entity.Users;
@@ -10,6 +12,8 @@ import com.orange.qcloud.service.UsersService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -27,13 +31,24 @@ public class UsersController {
     }
 
     @GetMapping("/get-by-email")
-    public ApiResponse<Users> getUserByEmail(@RequestParam String email) {
+    public ApiResponse<UsersDto> getUserByEmail(@RequestParam String email) {
         return ApiResponse.success(usersService.findUserByEmail(email));
+    }
+
+    @GetMapping("/get-by-token")
+    public ApiResponse<UsersDto> getUserByToken() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ApiResponse.success(usersService.findUserByEmail(auth.getName()));
     }
 
     @PostMapping("/register")
     public ApiResponse<AuthenticationResponse> register(@RequestBody RegisterRequest registerReq) {
         return ApiResponse.success(usersService.register(registerReq));
+    }
+
+    @GetMapping("/send-code")
+    public ApiResponse<String> sendCode(@RequestParam String email) {
+        return ApiResponse.success(usersService.sendEmailCode(email));
     }
 
     @PostMapping("/login")
