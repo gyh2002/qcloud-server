@@ -201,6 +201,7 @@ public class FilesServiceImpl implements FilesService {
             throw new ApiException(EnumError.UPDATE_FILE_FAILED);
         }
         file.setHash(FileUtils.getFileHash(Paths.get(ROOT_PATH, file.getPath()).toString()));
+        file.setVersionNo(file.getVersionNo() + 1);
         filesRepository.save(file);
         return "Update success";
     }

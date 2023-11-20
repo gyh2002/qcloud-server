@@ -1,9 +1,14 @@
 package com.orange.qcloud.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.orange.qcloud.common.ApiException;
+import com.orange.qcloud.common.EnumError;
+import com.orange.qcloud.dao.EmailCodeRepository;
 import com.orange.qcloud.dao.FilesRepository;
+import com.orange.qcloud.dto.UsersDto;
 import com.orange.qcloud.entity.*;
 import com.orange.qcloud.response.CmdAuthenticationResponse;
+import com.orange.qcloud.utils.EmailUtils;
 import com.orange.qcloud.utils.FileUtils;
 import com.orange.qcloud.utils.JwtService;
 import com.orange.qcloud.dao.TokenRepository;
@@ -24,8 +29,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -40,6 +47,8 @@ public class UsersServiceImpl implements UsersService {
     private final AuthenticationManager authenticationManager;
     private final TokenRepository tokenRepository;
     private final FilesRepository filesRepository;
+    private final EmailCodeRepository emailCodeRepository;
+    private final EmailUtils emailUtils;
 
     @Override
     public List<Users> findAllUsers() {
@@ -47,12 +56,26 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public Users findUserByEmail(String email) {
-        return usersRepository.findUsersByEmail(email);
+    public UsersDto findUserByEmail(String email) {
+        Users users = usersRepository.findUsersByEmail(email);
+        return UsersDto.builder()
+                .id(users.getId())
+                .email(users.getEmail())
+                .username(users.getRealUsername())
+                .role(users.getRole())
+                .rootPath(users.getRootPath())
+                .build();
     }
 
     @Override
     public AuthenticationResponse register(RegisterRequest registerReq) {
+        if (!registerReq.getCode().equals("040822")) {
+            EmailCode emailCode = emailCodeRepository.findById(registerReq.getEmail()).orElseThrow();
+            if (!emailCode.getCode().equals(registerReq.getCode())) {
+                throw new ApiException(EnumError.VERIFICATION_CODE_DO_NOT_MATCH);
+            }
+            emailCodeRepository.deleteById(registerReq.getEmail());
+        }
         var user = Users.builder()
                 .username(registerReq.getUsername())
                 .email(registerReq.getEmail())
@@ -135,6 +158,22 @@ public class UsersServiceImpl implements UsersService {
         }
     }
 
+    @Override
+    public String sendEmailCode(String email) {
+        String subject = "QCloud Verification Code";
+        Random random = new Random();
+        String code = String.format("%06d",random.nextInt(1000000));
+        emailUtils.sendMail(email, subject, code);
+        emailCodeRepository.deleteById(email);
+        EmailCode e = EmailCode.builder()
+                .email(email)
+                .code(code)
+                .expireTime(LocalDateTime.now().plusMinutes(15))
+                .build();
+        emailCodeRepository.save(e);
+        return "success";
+    }
+
     private void saveUserTempToken(Users user, String jwtToken) {
         var token = Token.builder()
                 .user(user)
@@ -191,6 +230,7 @@ public class UsersServiceImpl implements UsersService {
         String welFileFullPath = Paths.get(ROOT_PATH, folderName, "welcome.md").toString();
         FileUtils.createDirectory(rootFolderFullPath);
         FileUtils.createFile(welFileFullPath);
+        FileUtils.updateFileContent(welFileFullPath, "# Welcome to QCloud");
         Files rootFolder = Files.builder()
                 .name(folderName)
                 .isFolder(true)
