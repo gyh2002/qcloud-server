@@ -48,12 +48,11 @@ public class ImageServiceImpl implements ImageService {
     }
 
     private String saveImage(MultipartFile file) {
-        String folder = ROOT_PATH;
-
         if (file.isEmpty()) {
             throw new ApiException(EnumError.SAVE_IMAGE_FAILED);
         }
-        Path path = Paths.get(file.getOriginalFilename());
+        String oriName = file.getOriginalFilename();
+        Path path = Paths.get(oriName.replace("\\\\", "\\"));
         String oldFileName = path.getFileName().toString();
         String extension = "";
         String baseName = oldFileName;
@@ -65,7 +64,7 @@ public class ImageServiceImpl implements ImageService {
 
         String uuid = String.valueOf(UUID.randomUUID());
         String newFileName = baseName + "_" + uuid + extension;
-        String savePath = Paths.get(folder, newFileName).toString();
+        String savePath = Paths.get(ROOT_PATH, newFileName).toString();
         File dest = new File(savePath);
         try {
             file.transferTo(dest);
