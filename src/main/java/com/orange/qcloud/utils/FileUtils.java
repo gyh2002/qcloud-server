@@ -116,4 +116,9 @@ public class FileUtils {
 
         return sb.toString();
     }
+
+    public static String getFileNameByStringPath(String path) {
+        int index = Math.max(path.lastIndexOf("\\"), path.lastIndexOf("/"));
+        return path.substring(index + 1);
+    }
 }

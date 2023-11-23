@@ -3,6 +3,7 @@ package com.orange.qcloud.service.impl;
 import com.orange.qcloud.common.ApiException;
 import com.orange.qcloud.common.EnumError;
 import com.orange.qcloud.service.ImageService;
+import com.orange.qcloud.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -52,8 +53,7 @@ public class ImageServiceImpl implements ImageService {
             throw new ApiException(EnumError.SAVE_IMAGE_FAILED);
         }
         String oriName = file.getOriginalFilename();
-        Path path = Paths.get(oriName.replace("\\\\", "\\"));
-        String oldFileName = path.getFileName().toString();
+        String oldFileName = FileUtils.getFileNameByStringPath(oriName.replace("\\\\", "\\"));
         String extension = "";
         String baseName = oldFileName;
         int dotIndex = oldFileName.lastIndexOf('.');
