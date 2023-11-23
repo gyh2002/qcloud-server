@@ -106,7 +106,7 @@ public class UsersServiceImpl implements UsersService {
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
-        revokeAllUserTempTokens(user);
+        // revokeAllUserTempTokens(user);
         saveUserTempToken(user, jwtToken);
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
@@ -125,7 +125,7 @@ public class UsersServiceImpl implements UsersService {
         var user = usersRepository.findByEmail(loginReq.getEmail())
                 .orElseThrow();
         var jwtToken = jwtService.generateLongToken(user);
-        revokeAllUserForeverTokens(user);
+        // revokeAllUserForeverTokens(user);
         saveUserForeverToken(user, jwtToken);
         return CmdAuthenticationResponse.builder()
                 .accessToken(jwtToken)
@@ -147,7 +147,7 @@ public class UsersServiceImpl implements UsersService {
                     .orElseThrow();
             if (jwtService.isTokenValid(refreshToken, user)) {
                 var accessToken = jwtService.generateToken(user);
-                revokeAllUserTempTokens(user);
+                // revokeAllUserTempTokens(user);
                 saveUserTempToken(user, accessToken);
                 var authResponse = AuthenticationResponse.builder()
                         .accessToken(accessToken)
